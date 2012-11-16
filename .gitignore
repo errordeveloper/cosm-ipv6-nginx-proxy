@@ -1,0 +1,5 @@
+run/
+log/
+tmp/
+src/
+bin/nginx
