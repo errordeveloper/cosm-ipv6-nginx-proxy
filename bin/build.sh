@@ -24,4 +24,18 @@ git clone --depth=1 https://github.com/git-mirror/nginx src \
         --without-http_charset_module \
         --without-http_upstream_ip_hash_module \
         --without-http_rewrite_module \
-  && make -j3 && cp objs/nginx $PREFIX/bin/ && mkdir -p $PREFIX/{log,run,tmp}
+        --with-http_perl_module
+
+if [ $? -eq 0 ]
+then
+  [ `uname` = Darwin ] && \
+    sed "s/\-arch\ x86_64\ \-arch\ i386/-arch `uname -m`/" objs/Makefile \
+      > objs/Makefile.new && mv objs/Makefile.new objs/Makefile
+
+  ##TODO: figure out how to install perl module locally (CPAN?)
+  make -j3 \
+    && cp objs/nginx $PREFIX/bin/ \
+    && mkdir -p $PREFIX/{log,run,tmp} \
+    && cd ./objs/src/http/modules/perl/ \
+    && sudo -p 'Enter password to install "nginx.pm" system-wide:' make install
+fi
